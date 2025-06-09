@@ -1,70 +1,112 @@
 "use client"
 
-import type React from "react"
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom"
-import { LandingPage } from "@/components/pages/landing-page"
-import { LoginPage } from "@/components/pages/login-page"
-import { SafeZonePage } from "@/components/pages/safezone-page"
-import { TemplateEditorPage } from "@/components/pages/template-editor-page"
-import { AccountPage } from "@/components/pages/account-page"
-import { AuthProvider, useAuth } from "@/components/auth/auth-context"
-import { Navbar } from "@/components/layout/navbar"
+import { useState } from "react"
+import { VideoPlayer } from "@/components/video-player"
+import { SafeZoneSettings } from "@/components/safe-zone-settings"
+import { DetectionResults } from "@/components/detection-results"
+import { TopNavigation } from "@/components/top-navigation"
+import { TemplateEditor } from "@/components/template-editor"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth()
-  return user ? <>{children}</> : <Navigate to="/login" />
-}
+export default function Home() {
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [currentFile, setCurrentFile] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<string>("detection")
+  const [selectedPreset, setSelectedPreset] = useState<string | null>(null)
+  const [aspectRatio, setAspectRatio] = useState<string>("16:9")
 
-function AppContent() {
+  const handleRunDetection = () => {
+    setIsAnalyzing(true)
+    setProgress(0)
+
+    // Simulate progress
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(interval)
+          setIsAnalyzing(false)
+          return 100
+        }
+        return prev + 5
+      })
+    }, 300)
+  }
+
+  const handleFileUpload = (file: File) => {
+    setCurrentFile(file.name)
+  }
+
+  const handlePresetChange = (preset: string) => {
+    setSelectedPreset(preset)
+
+    // Update aspect ratio based on preset
+    switch (preset) {
+      case "youtube-shorts":
+      case "tiktok":
+      case "instagram-reels":
+      case "instagram-story":
+        setAspectRatio("9:16")
+        break
+      case "instagram-post":
+        setAspectRatio("1:1")
+        break
+      case "red":
+        setAspectRatio("3:4")
+        break
+      case "youtube-landscape":
+        setAspectRatio("16:9")
+        break
+      default:
+        setAspectRatio("16:9")
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/safezone"
-          element={
-            <ProtectedRoute>
-              <div className="flex flex-col h-screen">
-                <Navbar />
-                <SafeZonePage />
-              </div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/editor"
-          element={
-            <ProtectedRoute>
-              <div className="flex flex-col h-screen">
-                <Navbar />
-                <TemplateEditorPage />
-              </div>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/account"
-          element={
-            <ProtectedRoute>
-              <div className="flex flex-col h-screen">
-                <Navbar />
-                <AccountPage />
-              </div>
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+    <div className="flex flex-col h-screen bg-background text-foreground">
+      <TopNavigation currentFile={currentFile} />
+
+      <Tabs defaultValue="detection" value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+        <div className="border-b">
+          <TabsList className="w-full justify-start h-12 px-4 bg-background">
+            <TabsTrigger value="detection" className="data-[state=active]:bg-muted">
+              Safe Zone Detection
+            </TabsTrigger>
+            <TabsTrigger value="template-editor" className="data-[state=active]:bg-muted">
+              Template Editor
+            </TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="detection" className="flex-1 flex overflow-hidden m-0 p-0">
+          {/* Left Sidebar - Safe Zone Settings */}
+          <div className="w-80 border-r bg-card flex flex-col overflow-hidden">
+            <SafeZoneSettings
+              onFileUpload={handleFileUpload}
+              onRunDetection={handleRunDetection}
+              isAnalyzing={isAnalyzing}
+              onPresetChange={handlePresetChange}
+              selectedPreset={selectedPreset}
+            />
+          </div>
+
+          {/* Right Panel - Video Preview */}
+          <div className="flex-1 flex flex-col">
+            <div className="flex-1 p-4">
+              <VideoPlayer currentFile={currentFile} aspectRatio={aspectRatio} selectedPreset={selectedPreset} />
+            </div>
+
+            {/* Bottom Section - Detection Results */}
+            <div className="h-64 border-t bg-card">
+              <DetectionResults isAnalyzing={isAnalyzing} progress={progress} />
+            </div>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="template-editor" className="flex-1 m-0 p-0">
+          <TemplateEditor />
+        </TabsContent>
+      </Tabs>
     </div>
-  )
-}
-
-export default function App() {
-  return (
-    <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </Router>
   )
 }

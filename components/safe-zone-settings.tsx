@@ -9,7 +9,7 @@ import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FileVideo, Upload, ChevronDown, FolderOpen } from "lucide-react"
+import { FileVideo, Upload, ChevronDown } from "lucide-react"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -20,7 +20,6 @@ interface SafeZoneSettingsProps {
   isAnalyzing: boolean
   onPresetChange?: (preset: string) => void
   selectedPreset?: string | null
-  onShowSavedTemplates?: () => void
 }
 
 export function SafeZoneSettings({
@@ -29,7 +28,6 @@ export function SafeZoneSettings({
   isAnalyzing,
   onPresetChange,
   selectedPreset,
-  onShowSavedTemplates,
 }: SafeZoneSettingsProps) {
   const [overlayOpacity, setOverlayOpacity] = useState(50)
   const [overlayColor, setOverlayColor] = useState("#3b82f6")
@@ -162,12 +160,6 @@ export function SafeZoneSettings({
                 </Button>
               </div>
             </div>
-
-            {/* Load My Saved Templates Button */}
-            <Button variant="outline" className="w-full" onClick={onShowSavedTemplates}>
-              <FolderOpen className="h-4 w-4 mr-2" />
-              Load My Saved Templates
-            </Button>
 
             <div className="pt-2">
               <h3 className="text-sm font-medium mb-3">Platform Requirements</h3>

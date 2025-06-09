@@ -12,7 +12,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Download, Upload, Save, RefreshCw, Move } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { useAuth } from "@/components/auth/auth-context"
 
 interface GuidelineProps {
   id: string
@@ -34,7 +33,6 @@ interface SafeZoneProps {
 }
 
 export function TemplateEditor() {
-  const { user } = useAuth()
   const [aspectRatio, setAspectRatio] = useState("16:9")
   const [canvasWidth, setCanvasWidth] = useState(800)
   const [canvasHeight, setCanvasHeight] = useState(450) // 16:9 default
@@ -185,27 +183,17 @@ export function TemplateEditor() {
   }
 
   const handleSaveTemplate = () => {
-    if (!user) {
-      alert("Please log in to save templates")
-      return
-    }
-
     const template = {
-      id: Date.now().toString(),
       name: templateName,
       aspectRatio,
       safeZones,
       guidelines,
       platformRequirements,
-      createdAt: new Date().toISOString(),
     }
 
-    // Save to user's templates
-    const existingTemplates = JSON.parse(localStorage.getItem(`autoqc_templates_${user.id}`) || "[]")
-    existingTemplates.push(template)
-    localStorage.setItem(`autoqc_templates_${user.id}`, JSON.stringify(existingTemplates))
-
-    alert("Template saved to your account successfully!")
+    // In a real app, this would save to a database or local storage
+    console.log("Saving template:", template)
+    alert("Template saved successfully!")
   }
 
   const handleExportTemplate = () => {
@@ -387,19 +375,19 @@ export function TemplateEditor() {
         <div className="flex flex-col gap-2 mt-auto pt-4">
           <Button onClick={handleSaveTemplate}>
             <Save className="h-4 w-4 mr-2" />
-            Save Template to My Account
+            Save Template
           </Button>
 
           <div className="flex gap-2">
             <Button variant="outline" className="flex-1" onClick={handleExportTemplate}>
               <Download className="h-4 w-4 mr-2" />
-              Export Template (JSON)
+              Export
             </Button>
 
             <Button variant="outline" className="flex-1" asChild>
               <label>
                 <Upload className="h-4 w-4 mr-2" />
-                Import Template (JSON)
+                Import
                 <input type="file" className="hidden" accept=".json" onChange={handleImportTemplate} />
               </label>
             </Button>
