@@ -87,6 +87,20 @@
     textarea {
       font-size: 16px;
     }
+
+    /* Full screen video container */
+    .mobile-video-container {
+      height: calc(100vh - 200px);
+      max-height: calc(100vh - 200px);
+    }
+  }
+
+  /* Landscape orientation optimizations */
+  @media (max-width: 768px) and (orientation: landscape) {
+    .mobile-video-container {
+      height: calc(100vh - 120px);
+      max-height: calc(100vh - 120px);
+    }
   }
 }
 
@@ -94,13 +108,70 @@
 @keyframes float {
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(0px) translateX(-50%);
   }
   50% {
-    transform: translateY(-4px);
+    transform: translateY(-6px) translateX(-50%);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
   }
 }
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Enhanced mobile interactions */
+@layer components {
+  .mobile-touch-target {
+    @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
+  }
+
+  .mobile-floating-button {
+    @apply fixed z-50 bg-background/90 backdrop-blur-md border border-border/60;
+    @apply shadow-lg hover:shadow-xl transition-all duration-300;
+    @apply active:scale-95 transform;
+  }
+
+  .mobile-sidebar-overlay {
+    @apply fixed inset-0 bg-black/20 backdrop-blur-sm z-40;
+    @apply data-[state=open]:animate-in data-[state=closed]:animate-out;
+    @apply data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0;
+  }
+
+  .mobile-sidebar-content {
+    @apply fixed inset-y-0 left-0 z-50 w-full bg-background/95 backdrop-blur-md;
+    @apply data-[state=open]:animate-in data-[state=closed]:animate-out;
+    @apply data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left;
+    @apply data-[state=open]:duration-300 data-[state=closed]:duration-200;
+  }
+}
+
+/* Video player enhancements */
+.video-safe-zone {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.video-safe-zone:hover {
+  opacity: 0.8;
+}
+
+/* Better focus states for mobile */
+@media (max-width: 768px) {
+  button:focus-visible,
+  [role="button"]:focus-visible {
+    @apply ring-2 ring-primary ring-offset-2 ring-offset-background;
+  }
 }
