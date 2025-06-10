@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Download, Settings } from "lucide-react"
+import { Download } from "lucide-react"
 import { generatePDFReport } from "@/lib/pdf-generator"
 import { useState } from "react"
 import { UserAvatarDropdown } from "./user-avatar-dropdown"
@@ -75,9 +75,6 @@ export function TopNavigation({ currentFile }: TopNavigationProps) {
         >
           <Download className="h-4 w-4 mr-2" />
           {isGeneratingPDF ? "Generating..." : "Export PDF Report"}
-        </Button>
-        <Button variant="ghost" size="icon" className="hidden sm:flex">
-          <Settings className="h-5 w-5" />
         </Button>
         <UserAvatarDropdown />
       </div>
