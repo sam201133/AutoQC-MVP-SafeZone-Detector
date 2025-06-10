@@ -7,10 +7,11 @@ import { SafeZoneSettings } from "@/components/safe-zone-settings"
 import { DetectionResults } from "@/components/detection-results"
 import { TopNavigation } from "@/components/top-navigation"
 import { TemplateEditor } from "@/components/template-editor"
-import { MobileSidebar } from "@/components/mobile-sidebar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { Settings, Play } from "lucide-react"
+import { Play } from "lucide-react"
+import { EnhancedFloatingTrigger } from "@/components/enhanced-floating-trigger"
+import { EnhancedMobileLayout } from "@/components/enhanced-mobile-layout"
 
 export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -128,42 +129,36 @@ export default function Home() {
           <div className="md:hidden flex flex-col flex-1">
             {/* Mobile Header with Settings */}
             <div className="flex items-center justify-between p-4 border-b bg-card">
-              <MobileSidebar
-                title="Safe Zone Settings"
-                trigger={
-                  <Button variant="outline" size="sm">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Settings
-                  </Button>
-                }
-              >
-                <SafeZoneSettings
-                  onFileUpload={handleFileUpload}
-                  onRunDetection={handleRunDetection}
-                  isAnalyzing={isAnalyzing}
-                  onPresetChange={handlePresetChange}
-                  selectedPreset={selectedPreset}
-                />
-              </MobileSidebar>
+              <EnhancedFloatingTrigger
+                onClick={() => {
+                  /* Open settings sidebar */
+                }}
+                icon="menu"
+                position="left"
+              />
+              <h1 className="text-lg font-semibold">Safe Zone Detection</h1>
+              <div className="w-14" /> {/* Spacer for balance */}
             </div>
 
-            {/* Video Player */}
-            <div className="flex-1 p-4">
-              <VideoPlayer currentFile={currentFile} aspectRatio={aspectRatio} selectedPreset={selectedPreset} />
-            </div>
+            {/* Enhanced Mobile Layout */}
+            <EnhancedMobileLayout
+              bottomActions={
+                <Button className="w-full" onClick={handleRunDetection} disabled={isAnalyzing} size="lg">
+                  <Play className="h-4 w-4 mr-2" />
+                  {isAnalyzing ? "Analyzing..." : "Run Detection"}
+                </Button>
+              }
+            >
+              {/* Video Player */}
+              <div className="flex-1 p-4">
+                <VideoPlayer currentFile={currentFile} aspectRatio={aspectRatio} selectedPreset={selectedPreset} />
+              </div>
 
-            {/* Detection Results */}
-            <div className="h-48 border-t bg-card">
-              <DetectionResults isAnalyzing={isAnalyzing} progress={progress} />
-            </div>
-
-            {/* Fixed Bottom Button */}
-            <div className="p-4 border-t bg-card">
-              <Button className="w-full" onClick={handleRunDetection} disabled={isAnalyzing} size="lg">
-                <Play className="h-4 w-4 mr-2" />
-                {isAnalyzing ? "Analyzing..." : "Run Detection"}
-              </Button>
-            </div>
+              {/* Detection Results */}
+              <div className="h-48 border-t bg-card">
+                <DetectionResults isAnalyzing={isAnalyzing} progress={progress} />
+              </div>
+            </EnhancedMobileLayout>
           </div>
         </TabsContent>
 

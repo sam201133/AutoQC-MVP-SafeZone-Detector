@@ -13,8 +13,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { Download, Upload, Save, RefreshCw, Move } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { TemplatePreviewModal } from "./template-preview-modal"
-import { MobileTemplateSidebar } from "./mobile-template-sidebar"
-import { FloatingSidebarTrigger } from "./floating-sidebar-trigger"
+import { EnhancedMobileSidebar } from "./enhanced-mobile-sidebar"
+import { EnhancedFloatingTrigger } from "./enhanced-floating-trigger"
+import { EnhancedMobileLayout } from "./enhanced-mobile-layout"
+import { Separator } from "@/components/ui/separator"
 
 interface GuidelineProps {
   id: string
@@ -596,214 +598,327 @@ export function TemplateEditor() {
       {/* Mobile Layout */}
       <div className="md:hidden flex flex-col h-full w-full">
         {/* Floating Sidebar Trigger */}
-        <FloatingSidebarTrigger onClick={() => setIsMobileSidebarOpen(true)} />
+        <EnhancedFloatingTrigger onClick={() => setIsMobileSidebarOpen(true)} icon="settings" />
 
         {/* Mobile Sidebar */}
-        <MobileTemplateSidebar
+        <EnhancedMobileSidebar
           isOpen={isMobileSidebarOpen}
           onClose={() => setIsMobileSidebarOpen(false)}
-          templateName={templateName}
-          setTemplateName={setTemplateName}
-          aspectRatio={aspectRatio}
-          setAspectRatio={setAspectRatio}
-          showRulers={showRulers}
-          setShowRulers={setShowRulers}
-          safeZones={safeZones}
-          onSafeZoneToggle={handleSafeZoneToggle}
-          guidelines={guidelines}
-          onGuidelineRemove={handleGuidelineRemove}
-        />
+          title="Template Settings"
+        >
+          <div className="p-4 space-y-6">
+            {/* Basic Settings */}
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="mobile-template-name" className="text-sm font-medium">
+                  Template Name
+                </Label>
+                <Input
+                  id="mobile-template-name"
+                  value={templateName}
+                  onChange={(e) => setTemplateName(e.target.value)}
+                  placeholder="Enter template name"
+                  className="h-10"
+                />
+              </div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col p-4 pb-20">
-          {/* Canvas */}
-          <div className="flex-1 flex items-center justify-center bg-card rounded-lg border overflow-hidden mb-4">
-            <div className="relative" style={{ padding: showRulers ? "20px 0 0 20px" : 0 }}>
-              {/* Horizontal ruler */}
-              {showRulers && (
-                <div
-                  className="absolute top-0 left-20 h-5 bg-muted border-b flex items-center"
-                  style={{ width: `${canvasWidth}px` }}
-                >
-                  {/* Ruler markings */}
-                  {Array.from({ length: 11 }).map((_, i) => (
-                    <div
-                      key={`h-${i}`}
-                      className="absolute h-2 border-l border-muted-foreground/50"
-                      style={{ left: `${(i * canvasWidth) / 10}px` }}
-                    >
-                      <div className="absolute -left-3 top-2 text-[8px] text-muted-foreground">{i * 10}%</div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Vertical ruler */}
-              {showRulers && (
-                <div
-                  className="absolute top-20 left-0 w-5 bg-muted border-r flex items-center"
-                  style={{ height: `${canvasHeight}px` }}
-                >
-                  {/* Ruler markings */}
-                  {Array.from({ length: 11 }).map((_, i) => (
-                    <div
-                      key={`v-${i}`}
-                      className="absolute w-2 border-t border-muted-foreground/50"
-                      style={{ top: `${(i * canvasHeight) / 10}px` }}
-                    >
-                      <div className="absolute top-[-7px] left-2 text-[8px] text-muted-foreground rotate-90 origin-left">
-                        {i * 10}%
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Canvas */}
-              <div
-                ref={canvasRef}
-                className="relative bg-black touch-manipulation"
-                style={{
-                  width: `${canvasWidth}px`,
-                  height: `${canvasHeight}px`,
-                }}
-                onMouseDown={handleCanvasMouseDown}
-                onMouseMove={handleCanvasMouseMove}
-                onMouseUp={handleCanvasMouseUp}
-                onMouseLeave={handleCanvasMouseUp}
-                onTouchStart={(e) => {
-                  const touch = e.touches[0]
-                  const mouseEvent = new MouseEvent("mousedown", {
-                    clientX: touch.clientX,
-                    clientY: touch.clientY,
-                  })
-                  handleCanvasMouseDown(mouseEvent as any)
-                }}
-                onTouchMove={(e) => {
-                  e.preventDefault()
-                  const touch = e.touches[0]
-                  const mouseEvent = new MouseEvent("mousemove", {
-                    clientX: touch.clientX,
-                    clientY: touch.clientY,
-                  })
-                  handleCanvasMouseMove(mouseEvent as any)
-                }}
-                onTouchEnd={() => handleCanvasMouseUp()}
-              >
-                {/* Safe zones */}
-                {safeZones.map(
-                  (zone) =>
-                    zone.visible && (
-                      <div
-                        key={zone.id}
-                        className="absolute border border-white/20"
-                        style={{
-                          top: `${zone.top}%`,
-                          left: `${zone.left}%`,
-                          width: `${zone.width}%`,
-                          height: `${zone.height}%`,
-                          backgroundColor: zone.color,
-                        }}
-                      >
-                        <div className="absolute -top-6 left-0 text-xs px-1 py-0.5 rounded bg-black/70 text-white">
-                          {zone.name}
-                        </div>
-                      </div>
-                    ),
-                )}
-
-                {/* Guidelines */}
-                {guidelines.map((guide) => (
-                  <div
-                    key={guide.id}
-                    className={`absolute ${guide.type === "horizontal" ? "w-full border-t" : "h-full border-l"} border-blue-500`}
-                    style={{
-                      [guide.type === "horizontal" ? "top" : "left"]: `${guide.position}px`,
-                    }}
-                  >
-                    <div
-                      className={`absolute ${guide.type === "horizontal" ? "-top-6 left-1" : "top-1 -left-6"} text-xs px-1 py-0.5 rounded bg-blue-500 text-white`}
-                    >
-                      {guide.label}
-                    </div>
-                  </div>
-                ))}
-
-                {/* Drag indicator */}
-                {isDragging && dragType && (
-                  <div
-                    className={`absolute ${dragType === "horizontal" ? "w-full border-t-2" : "h-full border-l-2"} border-blue-500 border-dashed`}
-                    style={{
-                      [dragType === "horizontal" ? "top" : "left"]: `${dragPosition}px`,
-                    }}
-                  />
-                )}
-
-                {/* Center indicators */}
-                <div className="absolute top-1/2 left-0 w-full border-t border-white/20 border-dashed" />
-                <div className="absolute top-0 left-1/2 h-full border-l border-white/20 border-dashed" />
-
-                {/* Canvas instructions */}
-                {!isDragging && guidelines.length === 0 && (
-                  <div className="absolute inset-0 flex items-center justify-center text-white/50 pointer-events-none">
-                    <div className="text-center">
-                      <Move className="h-6 w-6 mx-auto mb-2 opacity-50" />
-                      <p className="text-sm">Tap on rulers to add guidelines</p>
-                      <p className="text-xs">Drag to position</p>
-                    </div>
-                  </div>
-                )}
+              <div className="space-y-2">
+                <Label htmlFor="mobile-aspect-ratio" className="text-sm font-medium">
+                  Aspect Ratio
+                </Label>
+                <Select value={aspectRatio} onValueChange={setAspectRatio}>
+                  <SelectTrigger id="mobile-aspect-ratio" className="h-10">
+                    <SelectValue placeholder="Select aspect ratio" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="16:9">16:9 (Landscape)</SelectItem>
+                    <SelectItem value="9:16">9:16 (Portrait)</SelectItem>
+                    <SelectItem value="1:1">1:1 (Square)</SelectItem>
+                    <SelectItem value="4:3">4:3 (Traditional)</SelectItem>
+                    <SelectItem value="3:4">3:4 (Portrait)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
+
+            <Separator />
+
+            {/* Display Settings */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium">Display Settings</h3>
+
+              <div className="flex items-center justify-between py-2">
+                <Label htmlFor="mobile-show-rulers" className="text-sm cursor-pointer">
+                  Show Rulers
+                </Label>
+                <Switch id="mobile-show-rulers" checked={showRulers} onCheckedChange={setShowRulers} />
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Safe Zones */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium">Safe Zones</h3>
+              <Card>
+                <CardContent className="p-3 space-y-3">
+                  {safeZones.map((zone) => (
+                    <div key={zone.id} className="flex items-center justify-between py-1">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-3 h-3 rounded-full flex-shrink-0"
+                          style={{ backgroundColor: zone.color.replace(/[^,]+\)/, "1)") }}
+                        />
+                        <Label htmlFor={`mobile-${zone.id}`} className="text-sm cursor-pointer">
+                          {zone.name}
+                        </Label>
+                      </div>
+                      <Switch
+                        id={`mobile-${zone.id}`}
+                        checked={zone.visible}
+                        onCheckedChange={(checked) => handleSafeZoneToggle(zone.id, checked)}
+                      />
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+
+            <Separator />
+
+            {/* Guidelines */}
+            <div className="space-y-4">
+              <h3 className="text-sm font-medium">Guidelines</h3>
+              <Card>
+                <CardContent className="p-3">
+                  {guidelines.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No guidelines added yet.
+                      <br />
+                      Tap on rulers to add guidelines.
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      {guidelines.map((guide) => (
+                        <div key={guide.id} className="flex items-center justify-between text-sm py-1">
+                          <div className="flex items-center gap-2">
+                            <div className="text-muted-foreground w-4 text-center">
+                              {guide.type === "horizontal" ? "—" : "|"}
+                            </div>
+                            <span>{guide.label}</span>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => handleGuidelineRemove(guide.id)}
+                          >
+                            ×
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Add some bottom padding to ensure content isn't hidden behind bottom actions */}
+            <div className="h-20" />
           </div>
+        </EnhancedMobileSidebar>
 
-          {/* Platform Requirements Section */}
-          <div className="space-y-2">
-            <Label htmlFor="mobile-platform-requirements" className="text-base font-semibold">
-              Platform Requirements
-            </Label>
-            <Textarea
-              id="mobile-platform-requirements"
-              value={platformRequirements}
-              onChange={(e) => setPlatformRequirements(e.target.value)}
-              onFocus={() => setIsRequirementsFocused(true)}
-              onBlur={() => setIsRequirementsFocused(false)}
-              placeholder={!isRequirementsFocused && !platformRequirements ? placeholderText : ""}
-              className="min-h-[100px] resize-none text-base"
-              style={{
-                color:
-                  platformRequirements || isRequirementsFocused
-                    ? "hsl(var(--foreground))"
-                    : "hsl(var(--muted-foreground))",
-              }}
-            />
+        {/* Main Content with Enhanced Layout */}
+        <EnhancedMobileLayout
+          bottomActions={
+            <div className="flex gap-2">
+              <Button onClick={handleSaveTemplate} className="flex-1 h-12">
+                <Save className="h-4 w-4 mr-2" />
+                Save
+              </Button>
+
+              <Button variant="outline" onClick={handleExportTemplate} className="h-12 px-4">
+                <Download className="h-4 w-4" />
+              </Button>
+
+              <Button variant="outline" asChild className="h-12 px-4">
+                <label>
+                  <Upload className="h-4 w-4" />
+                  <input type="file" className="hidden" accept=".json" onChange={handleImportTemplate} />
+                </label>
+              </Button>
+
+              <Button variant="outline" onClick={handleResetCanvas} className="h-12 px-4">
+                <RefreshCw className="h-4 w-4" />
+              </Button>
+            </div>
+          }
+        >
+          <div className="flex-1 flex flex-col p-4">
+            {/* Canvas */}
+            <div className="flex-1 flex items-center justify-center bg-card rounded-lg border overflow-hidden mb-4">
+              <div className="relative" style={{ padding: showRulers ? "20px 0 0 20px" : 0 }}>
+                {/* Horizontal ruler */}
+                {showRulers && (
+                  <div
+                    className="absolute top-0 left-20 h-5 bg-muted border-b flex items-center"
+                    style={{ width: `${canvasWidth}px` }}
+                  >
+                    {/* Ruler markings */}
+                    {Array.from({ length: 11 }).map((_, i) => (
+                      <div
+                        key={`h-${i}`}
+                        className="absolute h-2 border-l border-muted-foreground/50"
+                        style={{ left: `${(i * canvasWidth) / 10}px` }}
+                      >
+                        <div className="absolute -left-3 top-2 text-[8px] text-muted-foreground">{i * 10}%</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Vertical ruler */}
+                {showRulers && (
+                  <div
+                    className="absolute top-20 left-0 w-5 bg-muted border-r flex items-center"
+                    style={{ height: `${canvasHeight}px` }}
+                  >
+                    {/* Ruler markings */}
+                    {Array.from({ length: 11 }).map((_, i) => (
+                      <div
+                        key={`v-${i}`}
+                        className="absolute w-2 border-t border-muted-foreground/50"
+                        style={{ top: `${(i * canvasHeight) / 10}px` }}
+                      >
+                        <div className="absolute top-[-7px] left-2 text-[8px] text-muted-foreground rotate-90 origin-left">
+                          {i * 10}%
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Canvas */}
+                <div
+                  ref={canvasRef}
+                  className="relative bg-black touch-manipulation"
+                  style={{
+                    width: `${canvasWidth}px`,
+                    height: `${canvasHeight}px`,
+                  }}
+                  onMouseDown={handleCanvasMouseDown}
+                  onMouseMove={handleCanvasMouseMove}
+                  onMouseUp={handleCanvasMouseUp}
+                  onMouseLeave={handleCanvasMouseUp}
+                  onTouchStart={(e) => {
+                    const touch = e.touches[0]
+                    const mouseEvent = new MouseEvent("mousedown", {
+                      clientX: touch.clientX,
+                      clientY: touch.clientY,
+                    })
+                    handleCanvasMouseDown(mouseEvent as any)
+                  }}
+                  onTouchMove={(e) => {
+                    e.preventDefault()
+                    const touch = e.touches[0]
+                    const mouseEvent = new MouseEvent("mousemove", {
+                      clientX: touch.clientX,
+                      clientY: touch.clientY,
+                    })
+                    handleCanvasMouseMove(mouseEvent as any)
+                  }}
+                  onTouchEnd={() => handleCanvasMouseUp()}
+                >
+                  {/* Safe zones */}
+                  {safeZones.map(
+                    (zone) =>
+                      zone.visible && (
+                        <div
+                          key={zone.id}
+                          className="absolute border border-white/20"
+                          style={{
+                            top: `${zone.top}%`,
+                            left: `${zone.left}%`,
+                            width: `${zone.width}%`,
+                            height: `${zone.height}%`,
+                            backgroundColor: zone.color,
+                          }}
+                        >
+                          <div className="absolute -top-6 left-0 text-xs px-1 py-0.5 rounded bg-black/70 text-white">
+                            {zone.name}
+                          </div>
+                        </div>
+                      ),
+                  )}
+
+                  {/* Guidelines */}
+                  {guidelines.map((guide) => (
+                    <div
+                      key={guide.id}
+                      className={`absolute ${guide.type === "horizontal" ? "w-full border-t" : "h-full border-l"} border-blue-500`}
+                      style={{
+                        [guide.type === "horizontal" ? "top" : "left"]: `${guide.position}px`,
+                      }}
+                    >
+                      <div
+                        className={`absolute ${guide.type === "horizontal" ? "-top-6 left-1" : "top-1 -left-6"} text-xs px-1 py-0.5 rounded bg-blue-500 text-white`}
+                      >
+                        {guide.label}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Drag indicator */}
+                  {isDragging && dragType && (
+                    <div
+                      className={`absolute ${dragType === "horizontal" ? "w-full border-t-2" : "h-full border-l-2"} border-blue-500 border-dashed`}
+                      style={{
+                        [dragType === "horizontal" ? "top" : "left"]: `${dragPosition}px`,
+                      }}
+                    />
+                  )}
+
+                  {/* Center indicators */}
+                  <div className="absolute top-1/2 left-0 w-full border-t border-white/20 border-dashed" />
+                  <div className="absolute top-0 left-1/2 h-full border-l border-white/20 border-dashed" />
+
+                  {/* Canvas instructions */}
+                  {!isDragging && guidelines.length === 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center text-white/50 pointer-events-none">
+                      <div className="text-center">
+                        <Move className="h-6 w-6 mx-auto mb-2 opacity-50" />
+                        <p className="text-sm">Tap on rulers to add guidelines</p>
+                        <p className="text-xs">Drag to position</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Platform Requirements Section */}
+            <div className="space-y-2">
+              <Label htmlFor="mobile-platform-requirements" className="text-base font-semibold">
+                Platform Requirements
+              </Label>
+              <Textarea
+                id="mobile-platform-requirements"
+                value={platformRequirements}
+                onChange={(e) => setPlatformRequirements(e.target.value)}
+                onFocus={() => setIsRequirementsFocused(true)}
+                onBlur={() => setIsRequirementsFocused(false)}
+                placeholder={!isRequirementsFocused && !platformRequirements ? placeholderText : ""}
+                className="min-h-[100px] resize-none text-base"
+                style={{
+                  color:
+                    platformRequirements || isRequirementsFocused
+                      ? "hsl(var(--foreground))"
+                      : "hsl(var(--muted-foreground))",
+                }}
+              />
+            </div>
           </div>
-        </div>
-
-        {/* Fixed Bottom Action Bar */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t p-4 safe-area-pb">
-          <div className="flex gap-2">
-            <Button onClick={handleSaveTemplate} className="flex-1 h-12">
-              <Save className="h-4 w-4 mr-2" />
-              Save
-            </Button>
-
-            <Button variant="outline" onClick={handleExportTemplate} className="h-12 px-4">
-              <Download className="h-4 w-4" />
-            </Button>
-
-            <Button variant="outline" asChild className="h-12 px-4">
-              <label>
-                <Upload className="h-4 w-4" />
-                <input type="file" className="hidden" accept=".json" onChange={handleImportTemplate} />
-              </label>
-            </Button>
-
-            <Button variant="outline" onClick={handleResetCanvas} className="h-12 px-4">
-              <RefreshCw className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+        </EnhancedMobileLayout>
       </div>
 
       {/* Template Preview Modal */}

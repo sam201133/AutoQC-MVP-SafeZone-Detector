@@ -12,8 +12,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Settings, FileText, CreditCard, LogOut, Coins } from "lucide-react"
+import { Settings, FileText, CreditCard, LogOut } from "lucide-react"
+import { UserStatusIndicator } from "./user-status-indicator"
 
 interface UserType {
   email: string
@@ -64,18 +64,14 @@ export function UserAvatarDropdown() {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.name}</p>
-            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-            <div className="flex items-center gap-2 pt-1">
-              <Badge variant="outline" className="text-xs">
-                {user.plan}
-              </Badge>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                <Coins className="h-3 w-3" />
-                {user.credits} credits
+          <div className="flex flex-col space-y-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium leading-none">{user.name}</p>
+                <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
               </div>
             </div>
+            <UserStatusIndicator credits={user.credits} plan={user.plan} className="pt-1" />
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
