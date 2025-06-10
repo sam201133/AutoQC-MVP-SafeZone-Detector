@@ -168,36 +168,7 @@ export default function Home() {
         </TabsContent>
 
         <TabsContent value="template-editor" className="flex-1 m-0 p-0">
-          {/* Desktop Template Editor */}
-          <div className="hidden md:block h-full">
-            <TemplateEditor />
-          </div>
-
-          {/* Mobile Template Editor */}
-          <div className="md:hidden flex flex-col h-full">
-            {/* Mobile Header with Template Settings */}
-            <div className="flex items-center justify-between p-4 border-b bg-card">
-              <MobileSidebar
-                title="Template Settings"
-                trigger={
-                  <Button variant="outline" size="sm">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Template Settings
-                  </Button>
-                }
-              >
-                {/* Template settings content would go here */}
-                <div className="p-4">
-                  <p className="text-sm text-muted-foreground">Template settings panel content</p>
-                </div>
-              </MobileSidebar>
-            </div>
-
-            {/* Template Editor Content */}
-            <div className="flex-1 overflow-hidden">
-              <TemplateEditor />
-            </div>
-          </div>
+          <TemplateEditor />
         </TabsContent>
       </Tabs>
     </div>
