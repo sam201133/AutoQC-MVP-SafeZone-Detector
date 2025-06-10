@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Download, Settings } from "lucide-react"
 import { generatePDFReport } from "@/lib/pdf-generator"
 import { useState } from "react"
+import { UserAvatarDropdown } from "./user-avatar-dropdown"
 
 interface TopNavigationProps {
   currentFile: string | null
@@ -65,13 +66,20 @@ export function TopNavigation({ currentFile }: TopNavigationProps) {
       </div>
 
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="sm" onClick={handleExportPDF} disabled={isGeneratingPDF}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExportPDF}
+          disabled={isGeneratingPDF}
+          className="hidden sm:flex"
+        >
           <Download className="h-4 w-4 mr-2" />
           {isGeneratingPDF ? "Generating..." : "Export PDF Report"}
         </Button>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className="hidden sm:flex">
           <Settings className="h-5 w-5" />
         </Button>
+        <UserAvatarDropdown />
       </div>
     </div>
   )

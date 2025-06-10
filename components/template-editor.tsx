@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
 import { Download, Upload, Save, RefreshCw, Move } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { TemplatePreviewModal } from "./template-preview-modal"
 
 interface GuidelineProps {
   id: string
@@ -78,6 +79,8 @@ export function TemplateEditor() {
   ])
 
   const canvasRef = useRef<HTMLDivElement>(null)
+  const [previewTemplate, setPreviewTemplate] = useState<any>(null)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
 
   // Update canvas dimensions when aspect ratio changes
   useEffect(() => {
@@ -224,11 +227,9 @@ export function TemplateEditor() {
       reader.onload = (event) => {
         try {
           const template = JSON.parse(event.target?.result as string)
-          setTemplateName(template.name || "Imported Template")
-          setAspectRatio(template.aspectRatio || "16:9")
-          setSafeZones(template.safeZones || [])
-          setGuidelines(template.guidelines || [])
-          setPlatformRequirements(template.platformRequirements || "")
+          // Show preview instead of immediately applying
+          setPreviewTemplate(template)
+          setIsPreviewOpen(true)
         } catch (error) {
           console.error("Error parsing template file:", error)
           alert("Invalid template file format")
@@ -236,6 +237,17 @@ export function TemplateEditor() {
       }
 
       reader.readAsText(file)
+    }
+  }
+
+  const applyPreviewTemplate = () => {
+    if (previewTemplate) {
+      setTemplateName(previewTemplate.name || "Imported Template")
+      setAspectRatio(previewTemplate.aspectRatio || "16:9")
+      setSafeZones(previewTemplate.safeZones || [])
+      setGuidelines(previewTemplate.guidelines || [])
+      setPlatformRequirements(previewTemplate.platformRequirements || "")
+      setIsPreviewOpen(false)
     }
   }
 
@@ -553,6 +565,13 @@ export function TemplateEditor() {
           />
         </div>
       </div>
+      {/* Template Preview Modal */}
+      <TemplatePreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        onApply={applyPreviewTemplate}
+        template={previewTemplate}
+      />
     </div>
   )
 }
